@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"net/http"
-
 	"github.com/cworld1/aniya-blog/backend/internal/models"
 	"github.com/cworld1/aniya-blog/backend/internal/repository"
 	"github.com/cworld1/aniya-blog/backend/pkg/auth"

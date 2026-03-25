@@ -123,7 +123,7 @@ func (h *PageViewHandler) GetPageViewCounts(c *gin.Context) {
 // @Router /api/v1/pageviews/stats [get]
 func (h *PageViewHandler) GetSiteStats(c *gin.Context) {
 	totalViews, _ := h.pageViewRepo.GetTotalViews()
-	totalPosts, _ := h.postRepo.List(1, 1, nil)
+	totalPosts, _, _ := h.postRepo.List(1, 1, nil)
 	totalPostCount, _ := h.pageViewRepo.GetTotalPosts()
 
 	response.Success(c, gin.H{

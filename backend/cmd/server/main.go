@@ -13,7 +13,6 @@ import (
 	"github.com/cworld1/aniya-blog/backend/internal/repository"
 	"github.com/cworld1/aniya-blog/backend/pkg/auth"
 	"github.com/gin-gonic/gin"
-	"github.com/rs/cors"
 )
 
 // @title Aniya Blog API
@@ -37,7 +36,7 @@ import (
 // @description 使用 JWT 令牌进行认证，格式为 "Bearer {token}"
 func main() {
 	// 解析命令行参数
-	configPath := flag.String("config", "", "config file path")
+	_ = flag.String("config", "", "config file path")
 	flag.Parse()
 
 	// 加载配置
@@ -75,22 +74,19 @@ func main() {
 	r := gin.Default()
 
 	// 应用 CORS 中间件
-	c := cors.New(cors.Options{
-		AllowedOrigins:   cfg.Server.AllowOrigins,
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
-		ExposedHeaders:   []string{"Link"},
-		AllowCredentials: true,
-		MaxAge:           300,
-	})
-
-	// 应用中间件
-	r.Use(func() gin.HandlerFunc {
-		return func(c *gin.Context) {
-			corsHandler := c.Handler()
-			corsHandler.ServeHTTP(c.Writer, c.Request)
+	r.Use(func(c *gin.Context) {
+		c.Header("Access-Control-Allow-Origin", cfg.Server.AllowOrigins[0])
+		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS")
+		c.Header("Access-Control-Allow-Headers", "Accept, Authorization, Content-Type, X-CSRF-Token")
+		c.Header("Access-Control-Expose-Headers", "Link")
+		c.Header("Access-Control-Allow-Credentials", "true")
+		c.Header("Access-Control-Max-Age", "300")
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
 		}
-	}())
+		c.Next()
+	})
 	r.Use(middleware.Logger())
 	r.Use(middleware.Recovery())
 
@@ -114,26 +110,24 @@ func main() {
 		// 公开路由
 		public := v1.Group("")
 		{
-			// 文章
+			// 文章 - 使用 /p/ 前缀避免冲突
 			public.GET("/posts", postHandler.ListPosts)
-			public.GET("/posts/:id", postHandler.GetPost)
-			public.GET("/posts/slug/:slug", postHandler.GetPostBySlug)
 			public.GET("/posts/search", postHandler.SearchPosts)
-			public.GET("/tags/:tagSlug/posts", postHandler.ListPostsByTag)
-			public.GET("/categories/:categorySlug/posts", postHandler.ListPostsByCategory)
+			public.GET("/posts/slug/:slug", postHandler.GetPostBySlug)
+			public.GET("/posts/:slug/comments", commentHandler.ListCommentsByPost)
+			public.GET("/posts/:slug", postHandler.GetPost)
 
 			// 标签
 			public.GET("/tags", tagHandler.ListTags)
 			public.GET("/tags/all", tagHandler.GetAllTags)
+			public.GET("/tags/:slug/posts", postHandler.ListPostsByTag)
 			public.GET("/tags/:slug", tagHandler.GetTag)
 
 			// 分类
 			public.GET("/categories", categoryHandler.ListCategories)
 			public.GET("/categories/tree", categoryHandler.GetAllCategories)
+			public.GET("/categories/:slug/posts", postHandler.ListPostsByCategory)
 			public.GET("/categories/:slug", categoryHandler.GetCategory)
-
-			// 评论
-			public.GET("/posts/:post_id/comments", commentHandler.ListCommentsByPost)
 
 			// 页面浏览
 			public.POST("/pageviews", pageViewHandler.RecordPageView)
@@ -193,6 +187,5 @@ func main() {
 	addr := fmt.Sprintf(":%s", cfg.Server.Port)
 	log.Printf("Starting server on %s", addr)
 
-	// 使用 CORS 包装器启动
-	log.Fatal(http.ListenAndServe(addr, c.Handler(r)))
+	log.Fatal(r.Run(addr))
 }
