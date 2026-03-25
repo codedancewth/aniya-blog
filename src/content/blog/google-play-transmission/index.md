@@ -54,7 +54,7 @@ Google Play 的文档：[安卓发起构建支付参数](https://developer.andro
 
 APP 中进行的订阅场景，我们可以看下述时序图的设计：
 
-![订阅流程时序图](./subscription-flow.jpg)
+![订阅流程时序图](/images/blog/google-play/subscription-flow.jpg)
 
 ### 流程说明
 
