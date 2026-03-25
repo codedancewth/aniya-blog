@@ -6,7 +6,7 @@ Aniya Blog 的 Go 语言后端服务，提供完整的博客管理 API。
 
 - **语言**: Go 1.21+
 - **框架**: Gin
-- **数据库**: SQLite (通过 GORM)
+- **数据库**: SQLite / MySQL (通过 GORM)
 - **认证**: JWT
 - **文档**: Swagger
 
@@ -33,7 +33,7 @@ go mod tidy
 cp .env.example .env
 ```
 
-主要配置项：
+#### SQLite 配置（默认）
 
 ```env
 SERVER_PORT=8080
@@ -47,6 +47,66 @@ JWT_EXPIRE_TIME=24h
 
 ALLOW_ORIGIN=http://localhost:4321
 ```
+
+#### MySQL 配置
+
+```env
+SERVER_PORT=8080
+SERVER_MODE=debug
+
+DB_DRIVER=mysql
+DB_HOST=localhost
+DB_PORT=3306
+DB_DATABASE=aniya_blog
+DB_USERNAME=root
+DB_PASSWORD=your_password
+
+JWT_SECRET=your-secret-key-change-in-production
+JWT_EXPIRE_TIME=24h
+
+ALLOW_ORIGIN=http://localhost:4321
+```
+
+### 数据库初始化
+
+#### MySQL 数据库
+
+**方式一：使用初始化脚本（推荐）**
+
+Linux/macOS:
+```bash
+cd backend/database
+./init_mysql.sh -u root -p your_password -d aniyablog
+```
+
+Windows:
+```cmd
+cd backend\\database
+init_mysql.bat root your_password aniyablog
+```
+
+**方式二：手动执行 SQL**
+
+```bash
+# 创建数据库
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS \`aniya_blog\` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+
+# 导入表结构
+mysql -u root -p aniyablog < database/migrations/001_init.sql
+
+# 导入初始数据
+mysql -u root -p aniyablog < database/migrations/002_seed.sql
+```
+
+**方式三：自动迁移**
+
+程序启动时会自动执行表迁移，只需正确配置数据库连接即可。
+
+#### SQLite 数据库
+
+SQLite 无需手动初始化，程序启动时会自动创建数据库文件和表结构。
+
+详细数据库说明请参考：[database/README.md](database/README.md)
 
 ### 运行
 

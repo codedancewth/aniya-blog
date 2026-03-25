@@ -15,50 +15,50 @@ import (
 
 // PostHandler 文章处理器
 type PostHandler struct {
-	postRepo   *repository.PostRepository
-	tagRepo    *repository.TagRepository
+	postRepo     *repository.PostRepository
+	tagRepo      *repository.TagRepository
 	categoryRepo *repository.CategoryRepository
 }
 
 // NewPostHandler 创建文章处理器
 func NewPostHandler(postRepo *repository.PostRepository, tagRepo *repository.TagRepository, categoryRepo *repository.CategoryRepository) *PostHandler {
 	return &PostHandler{
-		postRepo:   postRepo,
-		tagRepo:    tagRepo,
+		postRepo:     postRepo,
+		tagRepo:      tagRepo,
 		categoryRepo: categoryRepo,
 	}
 }
 
 // CreatePostRequest 创建文章请求
 type CreatePostRequest struct {
-	Title       string `json:"title" binding:"required"`
-	Slug        string `json:"slug"`
-	Description string `json:"description"`
-	Content     string `json:"content"`
-	ContentHTML string `json:"content_html"`
-	CoverImage  string `json:"cover_image"`
-	CategoryID  *uint  `json:"category_id"`
+	Title       string   `json:"title" binding:"required"`
+	Slug        string   `json:"slug"`
+	Description string   `json:"description"`
+	Content     string   `json:"content"`
+	ContentHTML string   `json:"content_html"`
+	CoverImage  string   `json:"cover_image"`
+	CategoryID  *uint    `json:"category_id"`
 	TagNames    []string `json:"tag_names"`
-	Language    string `json:"language"`
-	IsTop       bool   `json:"is_top"`
-	CustomData  string `json:"custom_data"`
-	Status      int    `json:"status"` // 1: published, 0: draft
+	Language    string   `json:"language"`
+	IsTop       bool     `json:"is_top"`
+	CustomData  string   `json:"custom_data"`
+	Status      int      `json:"status"` // 1: published, 0: draft
 }
 
 // UpdatePostRequest 更新文章请求
 type UpdatePostRequest struct {
-	Title       string `json:"title"`
-	Slug        string `json:"slug"`
-	Description string `json:"description"`
-	Content     string `json:"content"`
-	ContentHTML string `json:"content_html"`
-	CoverImage  string `json:"cover_image"`
-	CategoryID  *uint  `json:"category_id"`
+	Title       string   `json:"title"`
+	Slug        string   `json:"slug"`
+	Description string   `json:"description"`
+	Content     string   `json:"content"`
+	ContentHTML string   `json:"content_html"`
+	CoverImage  string   `json:"cover_image"`
+	CategoryID  *uint    `json:"category_id"`
 	TagNames    []string `json:"tag_names"`
-	Language    string `json:"language"`
-	IsTop       bool   `json:"is_top"`
-	CustomData  string `json:"custom_data"`
-	Status      int    `json:"status"`
+	Language    string   `json:"language"`
+	IsTop       bool     `json:"is_top"`
+	CustomData  string   `json:"custom_data"`
+	Status      int      `json:"status"`
 }
 
 // CreatePost 创建文章

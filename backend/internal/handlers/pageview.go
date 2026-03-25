@@ -127,8 +127,8 @@ func (h *PageViewHandler) GetSiteStats(c *gin.Context) {
 	totalPostCount, _ := h.pageViewRepo.GetTotalPosts()
 
 	response.Success(c, gin.H{
-		"total_views":     totalViews,
-		"total_posts":     len(totalPosts),
+		"total_views":      totalViews,
+		"total_posts":      len(totalPosts),
 		"total_post_count": totalPostCount,
 	})
 }

@@ -14,7 +14,7 @@ import (
 
 // AuthHandler 认证处理器
 type AuthHandler struct {
-	userRepo  *repository.UserRepository
+	userRepo   *repository.UserRepository
 	jwtManager *auth.JWTManager
 }
 

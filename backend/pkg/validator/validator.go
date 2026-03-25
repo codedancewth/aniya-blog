@@ -49,17 +49,17 @@ func getSingleMessage(e validator.FieldError) string {
 
 func translateField(field string) string {
 	translations := map[string]string{
-		"Username":      "用户名",
-		"Password":      "密码",
-		"Email":         "邮箱",
-		"Nickname":      "昵称",
-		"Title":         "标题",
-		"Content":       "内容",
-		"Description":   "描述",
-		"Name":          "名称",
-		"URL":           "链接",
-		"OldPassword":   "旧密码",
-		"NewPassword":   "新密码",
+		"Username":        "用户名",
+		"Password":        "密码",
+		"Email":           "邮箱",
+		"Nickname":        "昵称",
+		"Title":           "标题",
+		"Content":         "内容",
+		"Description":     "描述",
+		"Name":            "名称",
+		"URL":             "链接",
+		"OldPassword":     "旧密码",
+		"NewPassword":     "新密码",
 		"ConfirmPassword": "确认密码",
 	}
 

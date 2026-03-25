@@ -24,12 +24,17 @@ type ServerConfig struct {
 
 // DatabaseConfig 数据库配置
 type DatabaseConfig struct {
-	Driver        string
-	DataSource    string
-	MaxIdleConns  int
-	MaxOpenConns  int
-	ConnMaxLife   time.Duration
-	AutoMigrate   bool
+	Driver       string
+	DataSource   string
+	Host         string // MySQL/PostgreSQL 主机地址
+	Port         string // MySQL/PostgreSQL 端口
+	Database     string // 数据库名
+	Username     string // 数据库用户名
+	Password     string // 数据库密码
+	MaxIdleConns int
+	MaxOpenConns int
+	ConnMaxLife  time.Duration
+	AutoMigrate  bool
 }
 
 // JWTConfig JWT 配置
@@ -55,19 +60,24 @@ func Load() *Config {
 
 	return &Config{
 		Server: ServerConfig{
-			Port:      getEnv("SERVER_PORT", "8080"),
-			Mode:      getEnv("SERVER_MODE", "debug"),
+			Port: getEnv("SERVER_PORT", "8080"),
+			Mode: getEnv("SERVER_MODE", "debug"),
 			AllowOrigins: []string{
 				getEnv("ALLOW_ORIGIN", "http://localhost:4321"),
 			},
 		},
 		Database: DatabaseConfig{
-			Driver:        getEnv("DB_DRIVER", "sqlite"),
-			DataSource:    getEnv("DB_SOURCE", "data/aniya.db"),
-			MaxIdleConns:  10,
-			MaxOpenConns:  100,
-			ConnMaxLife:   time.Hour,
-			AutoMigrate:   true,
+			Driver:       getEnv("DB_DRIVER", "sqlite"),
+			Host:         getEnv("DB_HOST", "localhost"),
+			Port:         getEnv("DB_PORT", "3306"),
+			Database:     getEnv("DB_DATABASE", "aniya_blog"),
+			Username:     getEnv("DB_USERNAME", "root"),
+			Password:     getEnv("DB_PASSWORD", ""),
+			DataSource:   getEnv("DB_SOURCE", ""),
+			MaxIdleConns: 10,
+			MaxOpenConns: 100,
+			ConnMaxLife:  time.Hour,
+			AutoMigrate:  true,
 		},
 		JWT: JWTConfig{
 			Secret:     getEnv("JWT_SECRET", "aniya-blog-secret-key-change-in-production"),
