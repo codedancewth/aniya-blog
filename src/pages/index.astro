@@ -9,6 +9,7 @@ import PageLayout from '@/layouts/BaseLayout.astro'
 import ProjectCard from '@/components/home/ProjectCard.astro'
 import Section from '@/components/home/Section.astro'
 import SkillLayout from '@/components/home/SkillLayout.astro'
+import GitHubActivity from '@/components/home/GitHubActivity.astro'
 import config from '@/site-config'
 
 // 教育图标
@@ -164,6 +165,10 @@ if (!images[imagePath])
         <SkillLayout title='Frontend' skills={frontend} />
         <SkillLayout title='Backend' skills={backend} />
         <SkillLayout title='AI-related' skills={aiRelated} />
+      </Section>
+
+      <Section title='GitHub Activity'>
+        <GitHubActivity />
       </Section>
     </div>
     <Quote class='mt-12' />
