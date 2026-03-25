@@ -11,6 +11,9 @@ import Section from '@/components/home/Section.astro'
 import SkillLayout from '@/components/home/SkillLayout.astro'
 import config from '@/site-config'
 
+// 教育图标
+const eduLogo = await import('@/assets/icons/edu-logo.png')
+
 const languages = ['Html', 'JavaScript', 'CSS', 'Shell']
 const frontend = ['TypeScript', 'Vite', 'Webpack', 'Astro']
 const backend = ['Go', 'Java', 'MySQL', 'RabbitMQ', 'Kafka']
@@ -128,11 +131,18 @@ if (!images[imagePath])
     </Section> */
       }
       <Section title='Education'>
-        <Card
-          heading='河北大学'
-          subheading='软件工程 本科'
-          date='2016 - 2020'
-        />
+        <div class='flex items-center gap-x-4'>
+          <Image
+            src={eduLogo.default}
+            alt='河北大学校徽'
+            class='h-12 w-auto'
+          />
+          <div>
+            <h3 class='text-lg font-medium'>河北大学</h3>
+            <p class='text-muted-foreground'>软件工程 本科</p>
+            <p class='text-sm text-muted-foreground'>2016 - 2020</p>
+          </div>
+        </div>
       </Section>
 
       <Section title='Website List'>
