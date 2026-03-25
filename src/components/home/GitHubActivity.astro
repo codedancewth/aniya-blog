@@ -26,7 +26,7 @@ async function fetchGitHubEvents() {
       },
     })
     const data = await response.json()
-    return data.filter((event: GitHubEvent) => event.type === 'PushEvent').slice(0, 5)
+    return data.filter((event: GitHubEvent) => event.type === 'PushEvent').slice(0, 2)
   } catch (error) {
     console.error('Error fetching GitHub events:', error)
     return []
