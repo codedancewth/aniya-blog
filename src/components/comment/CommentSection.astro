@@ -7,7 +7,7 @@ const { class: className, postId } = Astro.props
 
 {
   // @ts-ignore - 自定义配置
-  config.integ.comment.enable && (
+  config.integ?.comment?.enable && (
     <div id="comment-section" class={cn('not-prose', className)}>
       <div class="comment-form">
         <h3>发表评论</h3>
