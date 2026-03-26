@@ -142,32 +142,33 @@ func (h *CommentHandler) GetComment(c *gin.Context) {
 	response.Success(c, comment)
 }
 
-// ListCommentsByPost 根据文章 ID 或 slug 获取评论列表
-// @Summary 根据文章 ID 或 slug 获取评论列表
+// ListCommentsByPost 根据文章 slug 获取评论列表
+// @Summary 根据文章 slug 获取评论列表
 // @Tags 评论
 // @Produce json
-// @Param post_id path string true "文章 ID 或 slug"
+// @Param post_id path string true "文章 slug"
 // @Param page query int false "页码" default(1)
 // @Param pageSize query int false "每页数量" default(10)
 // @Success 200 {object} response.Response
 // @Router /api/v1/posts/:post_id/comments [get]
 func (h *CommentHandler) ListCommentsByPost(c *gin.Context) {
-	postParam := c.Param("post_id")
+	postSlug := c.Param("post_id")
 	
-	// 尝试解析为数字 ID，如果失败则作为 slug 处理
-	var postID uint
-	post, err := h.postRepo.FindBySlug(postParam)
+	// 直接使用 slug 查找文章
+	post, err := h.postRepo.FindBySlug(postSlug)
 	if err != nil {
-		// 尝试作为数字 ID 解析
-		id, parseErr := strconv.ParseUint(postParam, 10, 32)
-		if parseErr != nil {
-			response.Error(c, response.ERROR, "invalid post id or slug")
-			return
-		}
-		postID = uint(id)
-	} else {
-		postID = post.ID
+		// slug 找不到，返回空列表而不是错误
+		response.Success(c, gin.H{
+			"comments":   []interface{}{},
+			"total":      0,
+			"page":       1,
+			"pageSize":   10,
+			"totalPages": 0,
+		})
+		return
 	}
+	
+	postID := post.ID
 
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "10"))
