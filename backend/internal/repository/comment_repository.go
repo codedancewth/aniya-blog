@@ -47,18 +47,22 @@ func (r *CommentRepository) ListByPostID(postID uint, page, pageSize int) ([]*mo
 
 	offset := (page - 1) * pageSize
 
-	query := r.db.Model(&models.Comment{}).
-		Preload("User").
-		Preload("Replies", func(db *gorm.DB) *gorm.DB {
-			return db.Order("created_at ASC")
-		}).
+	// 先查询总数
+	countQuery := r.db.Model(&models.Comment{}).
 		Where("post_id = ? AND status = ? AND parent_id IS NULL", postID, 1)
-
-	if err := query.Count(&total).Error; err != nil {
+	
+	if err := countQuery.Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
 
-	err := query.Order("created_at DESC").Offset(offset).Limit(pageSize).Find(&comments).Error
+	// 查询评论（不 Preload User，避免 NULL 用户 ID 导致的问题）
+	query := r.db.Model(&models.Comment{}).
+		Where("post_id = ? AND status = ? AND parent_id IS NULL", postID, 1).
+		Order("created_at DESC").
+		Offset(offset).
+		Limit(pageSize)
+
+	err := query.Find(&comments).Error
 	return comments, total, err
 }
 

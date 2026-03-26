@@ -117,6 +117,11 @@ func main() {
 			public.GET("/posts/:slug/comments", commentHandler.ListCommentsByPost)
 			public.GET("/posts/:slug", postHandler.GetPost)
 
+			// 评论 - 允许匿名评论
+			public.POST("/comments", commentHandler.CreateComment)
+			public.GET("/comments/:id", commentHandler.GetComment)
+			public.POST("/comments/:id/like", commentHandler.LikeComment)
+
 			// 标签
 			public.GET("/tags", tagHandler.ListTags)
 			public.GET("/tags/all", tagHandler.GetAllTags)
@@ -160,11 +165,9 @@ func main() {
 			protected.PUT("/categories/:slug", categoryHandler.UpdateCategory)
 			protected.DELETE("/categories/:slug", categoryHandler.DeleteCategory)
 
-			// 评论管理
-			protected.POST("/comments", commentHandler.CreateComment)
+			// 评论管理（管理员）
 			protected.PUT("/comments/:id", commentHandler.UpdateComment)
 			protected.DELETE("/comments/:id", commentHandler.DeleteComment)
-			protected.POST("/comments/:id/like", commentHandler.LikeComment)
 		}
 
 		// 需要管理员权限的路由

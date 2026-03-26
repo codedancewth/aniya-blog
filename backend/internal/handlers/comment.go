@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/cworld1/aniya-blog/backend/internal/models"
@@ -152,12 +153,17 @@ func (h *CommentHandler) GetComment(c *gin.Context) {
 // @Success 200 {object} response.Response
 // @Router /api/v1/posts/:post_id/comments [get]
 func (h *CommentHandler) ListCommentsByPost(c *gin.Context) {
-	postSlug := c.Param("post_id")
+	postParam := c.Param("post_id")
+	
+	fmt.Printf("DEBUG: postParam=%s\n", postParam)
 	
 	// 直接使用 slug 查找文章
-	post, err := h.postRepo.FindBySlug(postSlug)
+	post, err := h.postRepo.FindBySlug(postParam)
+	fmt.Printf("DEBUG: FindBySlug result: post=%+v, err=%v\n", post, err)
+	
 	if err != nil {
 		// slug 找不到，返回空列表而不是错误
+		fmt.Printf("DEBUG: Returning empty list\n")
 		response.Success(c, gin.H{
 			"comments":   []interface{}{},
 			"total":      0,
@@ -169,15 +175,19 @@ func (h *CommentHandler) ListCommentsByPost(c *gin.Context) {
 	}
 	
 	postID := post.ID
+	fmt.Printf("DEBUG: postID=%d\n", postID)
 
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "10"))
 
+	fmt.Printf("DEBUG: postID=%d, page=%d, pageSize=%d\n", postID, page, pageSize)
 	comments, total, err := h.commentRepo.ListByPostID(uint(postID), page, pageSize)
 	if err != nil {
+		fmt.Printf("DEBUG: Error from repo: %v\n", err)
 		response.Error(c, response.ERROR, "failed to get comments")
 		return
 	}
+	fmt.Printf("DEBUG: total=%d, comments count=%d\n", total, len(comments))
 
 	response.PageSuccess(c, comments, total, page, pageSize)
 }

@@ -79,10 +79,12 @@ const { class: className, postId } = Astro.props
     async loadComments() {
       // 使用当前页面路径作为 post identifier
       const postPath = window.location.pathname
+      // 提取 slug（去掉 /blog/ 前缀和末尾斜杠）
+      const postSlug = postPath.replace(/^\/blog\//, '').replace(/\/$/, '')
       
       try {
         // @ts-ignore - 自定义属性
-        const response = await fetch(`${API_URL}/posts${postPath}/comments?page=${this.page}&pageSize=${this.pageSize}`)
+        const response = await fetch(`${API_URL}/posts/${postSlug}/comments?page=${this.page}&pageSize=${this.pageSize}`)
         const result = await response.json()
         
         if (result.code === 200 || result.code === 0) {
