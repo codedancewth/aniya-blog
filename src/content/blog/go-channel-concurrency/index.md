@@ -45,9 +45,13 @@ fmt.Println(<-ch)
 
 阻塞场景，并发场景，多数据的发送和多用户接收需要从 channel 中慢慢存和取，时间上延时性高，但是实现了高性能高效率传输。
 
+![Buffered Channel](./img1-buffered.jpg)
+
 ### Unbuffered Channel（非阻塞）
 
 非阻塞场景也是比较常见的，它实现了数据的快速发送和接收，常用于对等单个 goroutine 使用，一对一聊天室？低延时，但需要多个 goroutine 的建立，消耗大量性能。
+
+![Unbuffered Channel](./img2-unbuffered.jpg)
 
 ## 四、Channel 的简单场景应用
 
@@ -192,6 +196,8 @@ func player(name string, court chan int) {
 比如说：
 
 **管道 closed 后，不允许再发送数据，如果在发送数据会产生 panic 报错。**
+
+![Channel 关闭后禁止发送](./img3-channel-closed.jpg)
 
 ```go
 ch := make(chan int)
