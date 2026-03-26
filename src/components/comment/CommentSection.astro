@@ -77,13 +77,12 @@ const { class: className, postId } = Astro.props
     }
 
     async loadComments() {
-      // @ts-ignore - querySelector 返回 Element
-      const postId = this.querySelector('input[name="post_id"]')?.value
-      if (!postId) return
-
+      // 使用当前页面路径作为 post identifier
+      const postPath = window.location.pathname
+      
       try {
         // @ts-ignore - 自定义属性
-        const response = await fetch(`${API_URL}/posts/${postId}/comments?page=${this.page}&pageSize=${this.pageSize}`)
+        const response = await fetch(`${API_URL}/posts${postPath}/comments?page=${this.page}&pageSize=${this.pageSize}`)
         const result = await response.json()
         
         if (result.code === 200 || result.code === 0) {
@@ -139,8 +138,10 @@ const { class: className, postId } = Astro.props
         e.preventDefault()
         
         const formData = new FormData(form)
+        // 使用当前页面路径作为 post slug
+        const postSlug = window.location.pathname.replace(/^\/blog\//, '').replace(/\/$/, '')
         const data = {
-          post_id: parseInt(formData.get('post_id')),
+          post_slug: postSlug,
           content: formData.get('content'),
           author_name: formData.get('author_name'),
           author_email: formData.get('author_email'),

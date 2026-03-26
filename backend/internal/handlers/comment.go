@@ -26,12 +26,13 @@ func NewCommentHandler(commentRepo *repository.CommentRepository, postRepo *repo
 
 // CreateCommentRequest 创建评论请求
 type CreateCommentRequest struct {
-	Content     string `json:"content" binding:"required"`
-	PostID      uint   `json:"post_id" binding:"required"`
-	ParentID    *uint  `json:"parent_id"`
-	AuthorName  string `json:"author_name"`
+	Content    string `json:"content" binding:"required"`
+	PostSlug   string `json:"post_slug" binding:"required"`
+	PostID     *uint  `json:"post_id"`  // 兼容旧版本
+	ParentID   *uint  `json:"parent_id"`
+	AuthorName string `json:"author_name"`
 	AuthorEmail string `json:"author_email"`
-	AuthorURL   string `json:"author_url"`
+	AuthorURL  string `json:"author_url"`
 }
 
 // CreateComment 创建评论
@@ -49,10 +50,24 @@ func (h *CommentHandler) CreateComment(c *gin.Context) {
 		return
 	}
 
-	// 检查文章是否存在
-	_, err := h.postRepo.FindByID(req.PostID)
-	if err != nil {
-		response.Error(c, response.POST_NOT_FOUND, "post not found")
+	// 检查文章是否存在（优先使用 slug，兼容 post_id）
+	var postID uint
+	if req.PostSlug != "" {
+		post, err := h.postRepo.FindBySlug(req.PostSlug)
+		if err != nil {
+			response.Error(c, response.POST_NOT_FOUND, "post not found by slug: "+req.PostSlug)
+			return
+		}
+		postID = post.ID
+	} else if req.PostID != nil {
+		postID = *req.PostID
+		_, err := h.postRepo.FindByID(postID)
+		if err != nil {
+			response.Error(c, response.POST_NOT_FOUND, "post not found")
+			return
+		}
+	} else {
+		response.Error(c, response.ERROR, "post_slug or post_id is required")
 		return
 	}
 
@@ -84,7 +99,7 @@ func (h *CommentHandler) CreateComment(c *gin.Context) {
 
 	comment := &models.Comment{
 		Content:     req.Content,
-		PostID:      req.PostID,
+		PostID:      postID,
 		ParentID:    req.ParentID,
 		UserID:      userID,
 		AuthorName:  authorName,
@@ -127,20 +142,31 @@ func (h *CommentHandler) GetComment(c *gin.Context) {
 	response.Success(c, comment)
 }
 
-// ListCommentsByPost 根据文章 ID 获取评论列表
-// @Summary 根据文章 ID 获取评论列表
+// ListCommentsByPost 根据文章 ID 或 slug 获取评论列表
+// @Summary 根据文章 ID 或 slug 获取评论列表
 // @Tags 评论
 // @Produce json
-// @Param post_id path uint true "文章 ID"
+// @Param post_id path string true "文章 ID 或 slug"
 // @Param page query int false "页码" default(1)
 // @Param pageSize query int false "每页数量" default(10)
 // @Success 200 {object} response.Response
 // @Router /api/v1/posts/:post_id/comments [get]
 func (h *CommentHandler) ListCommentsByPost(c *gin.Context) {
-	postID, err := strconv.ParseUint(c.Param("post_id"), 10, 32)
+	postParam := c.Param("post_id")
+	
+	// 尝试解析为数字 ID，如果失败则作为 slug 处理
+	var postID uint
+	post, err := h.postRepo.FindBySlug(postParam)
 	if err != nil {
-		response.Error(c, response.ERROR, "invalid post id")
-		return
+		// 尝试作为数字 ID 解析
+		id, parseErr := strconv.ParseUint(postParam, 10, 32)
+		if parseErr != nil {
+			response.Error(c, response.ERROR, "invalid post id or slug")
+			return
+		}
+		postID = uint(id)
+	} else {
+		postID = post.ID
 	}
 
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
