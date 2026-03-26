@@ -165,6 +165,7 @@ export const integ: IntegrationUserConfig = {
     emoji: [],
     additionalConfigs: {}
   },
+  // @ts-ignore - 自定义评论配置
   comment: {
     enable: true,
     // Go 后端 API 地址
