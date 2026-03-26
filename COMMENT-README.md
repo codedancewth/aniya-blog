@@ -57,7 +57,7 @@
 ```bash
 cd /root/.openclaw/workspace/aniya-blog
 # 停止当前运行的 dev 服务器（Ctrl+C）
-bun run dev
+npm run dev
 ```
 
 ### 2. 测试评论功能
@@ -97,19 +97,23 @@ curl http://localhost:8081/api/v1/posts/1/comments
 
 ### 新增文件
 - ✅ `src/components/comment/CommentSection.astro` - 新评论组件
+- ✅ `COMMENT-README.md` - 本文档
 
 ### 修改文件
 - ✅ `src/layouts/BlogPost.astro` - 使用新评论组件
 - ✅ `src/site.config.ts` - 移除 Waline，添加 comment 配置
 - ✅ `backend/.env` - 启用 MySQL 配置
 
-### 可清理的文件
+### 已清理的文件
+- ✅ `waline-server/` - 已删除
+- ✅ `waline-docker-compose.yml` - 已删除
+- ✅ `.env.waline.example` - 已删除
+- ✅ `WALINE-*.md` - 已删除
+
+### 可选清理
 ```bash
-# Waline 相关文件（可选删除）
-rm -rf waline-server/
-rm -f waline-docker-compose.yml
-rm -f WALINE-*.md
-rm -rf src/components/waline/  # 或者保留备用
+# Waline 前端组件（可选删除）
+rm -rf src/components/waline/
 ```
 
 ---
@@ -264,14 +268,14 @@ mysql -u root -pAniyaBlog@2026 -e "SELECT 1"
 - [x] 创建前端评论组件
 - [x] 更新博客布局
 - [x] 移除 Waline 配置
+- [x] 清理 Waline 相关文件
 - [x] 启动 Go 后端服务
 - [ ] 重启前端开发服务器
 - [ ] 测试评论功能
-- [ ] 清理 Waline 文件
 
 ---
 
-**更新时间**: 2026-03-26 10:00  
+**更新时间**: 2026-03-26 10:30  
 **架构**: Go Backend (Gin) + MySQL  
 **前端**: Astro Pure + 自定义评论组件  
 **API**: RESTful (/api/v1/comments)

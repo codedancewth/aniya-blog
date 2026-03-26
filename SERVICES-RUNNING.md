@@ -287,7 +287,15 @@ ps aux | grep "go run"
 
 ---
 
-**更新时间**: 2026-03-26 10:10  
+## 📁 相关文档
+
+- `COMMENT-README.md` - 评论系统详细说明
+- `PROJECT-INFO-REPORT.md` - 项目信息清理报告
+- `COMMENT-SETUP.md` - 部署指南（备用）
+
+---
+
+**更新时间**: 2026-03-26 10:30  
 **前端**: Astro v5.18.1  
 **后端**: Go + Gin  
 **数据库**: MySQL 8.0
