@@ -1,0 +1,369 @@
+---
+import config from '@/site.config'
+import { cn } from 'astro-pure/utils'
+
+const { class: className, postId } = Astro.props
+---
+
+{
+  config.integ.comment.enable && (
+    <div id="comment-section" class={cn('not-prose', className)}>
+      <div class="comment-form">
+        <h3>发表评论</h3>
+        <form id="comment-form">
+          <input type="hidden" name="post_id" value={postId} />
+          
+          <div class="form-group">
+            <textarea 
+              name="content" 
+              placeholder="写下你的评论..." 
+              required
+              rows="4"
+            ></textarea>
+          </div>
+          
+          <div class="form-group guest-fields">
+            <input 
+              type="text" 
+              name="author_name" 
+              placeholder="昵称 *" 
+              required
+            />
+            <input 
+              type="email" 
+              name="author_email" 
+              placeholder="邮箱 *" 
+              required
+            />
+            <input 
+              type="url" 
+              name="author_url" 
+              placeholder="网站（可选）" 
+            />
+          </div>
+          
+          <button type="submit" class="submit-btn">提交评论</button>
+        </form>
+      </div>
+      
+      <div class="comment-list" id="comment-list">
+        <div class="loading">加载中...</div>
+      </div>
+    </div>
+  )
+}
+
+<script>
+  import config from 'virtual:config'
+  
+  const API_URL = config.integ.comment.apiURL
+  
+  class CommentSection extends HTMLElement {
+    constructor() {
+      super()
+      this.comments = []
+      this.page = 1
+      this.pageSize = 10
+    }
+
+    connectedCallback() {
+      this.loadComments()
+      this.setupForm()
+    }
+
+    async loadComments() {
+      const postId = this.querySelector('input[name="post_id"]')?.value
+      if (!postId) return
+
+      try {
+        const response = await fetch(`${API_URL}/posts/${postId}/comments?page=${this.page}&pageSize=${this.pageSize}`)
+        const result = await response.json()
+        
+        if (result.code === 200 || result.code === 0) {
+          this.comments = result.data || []
+          this.renderComments()
+        } else {
+          this.renderError('加载评论失败')
+        }
+      } catch (error) {
+        console.error('Failed to load comments:', error)
+        this.renderError('加载评论失败，请检查网络连接')
+      }
+    }
+
+    renderComments() {
+      const listEl = this.querySelector('#comment-list')
+      if (!listEl) return
+
+      if (this.comments.length === 0) {
+        listEl.innerHTML = '<div class="no-comments">暂无评论，快来抢沙发吧！</div>'
+        return
+      }
+
+      const html = this.comments.map(comment => `
+        <div class="comment-item" data-id="${comment.id}">
+          <div class="comment-header">
+            <span class="comment-author">${this.escapeHtml(comment.author_name || '匿名用户')}</span>
+            <span class="comment-date">${new Date(comment.created_at).toLocaleDateString('zh-CN')}</span>
+            ${comment.is_admin ? '<span class="admin-badge">管理员</span>' : ''}
+          </div>
+          <div class="comment-content">${this.escapeHtml(comment.content)}</div>
+          <div class="comment-footer">
+            <button class="like-btn" data-id="${comment.id}">
+              👍 ${comment.like_count || 0}
+            </button>
+            <button class="reply-btn" data-id="${comment.id}">回复</button>
+          </div>
+        </div>
+      `).join('')
+
+      listEl.innerHTML = html
+      this.setupLikeButtons()
+    }
+
+    setupForm() {
+      const form = this.querySelector('#comment-form')
+      if (!form) return
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault()
+        
+        const formData = new FormData(form)
+        const data = {
+          post_id: parseInt(formData.get('post_id')),
+          content: formData.get('content'),
+          author_name: formData.get('author_name'),
+          author_email: formData.get('author_email'),
+          author_url: formData.get('author_url') || undefined
+        }
+
+        const submitBtn = form.querySelector('.submit-btn')
+        submitBtn.disabled = true
+        submitBtn.textContent = '提交中...'
+
+        try {
+          const response = await fetch(`${API_URL}/comments`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+          })
+
+          const result = await response.json()
+          
+          if (result.code === 200 || result.code === 0) {
+            alert('评论成功！')
+            form.reset()
+            this.loadComments()
+          } else {
+            alert(result.message || '评论失败')
+          }
+        } catch (error) {
+          console.error('Failed to submit comment:', error)
+          alert('评论失败，请重试')
+        } finally {
+          submitBtn.disabled = false
+          submitBtn.textContent = '提交评论'
+        }
+      })
+    }
+
+    setupLikeButtons() {
+      this.querySelectorAll('.like-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const commentId = e.target.dataset.id
+          try {
+            const response = await fetch(`${API_URL}/comments/${commentId}/like`, {
+              method: 'POST'
+            })
+            const result = await response.json()
+            if (result.code === 200 || result.code === 0) {
+              btn.textContent = `👍 ${(parseInt(btn.textContent.match(/\d+/)[0]) || 0) + 1}`
+            }
+          } catch (error) {
+            console.error('Failed to like comment:', error)
+          }
+        })
+      })
+    }
+
+    escapeHtml(text) {
+      if (!text) return ''
+      const div = document.createElement('div')
+      div.textContent = text
+      return div.innerHTML
+    }
+
+    renderError(message) {
+      const listEl = this.querySelector('#comment-list')
+      if (!listEl) return
+      listEl.innerHTML = `<div class="error">${message}</div>`
+    }
+  }
+
+  if (config.integ.comment.enable) {
+    customElements.define('comment-section', CommentSection)
+  }
+</script>
+
+<style>
+  #comment-section {
+    --comment-border-color: hsl(var(--border));
+    --comment-bg: hsl(var(--background));
+    --comment-text: hsl(var(--foreground));
+    --comment-muted: hsl(var(--muted-foreground));
+    --comment-primary: hsl(var(--primary));
+    
+    max-width: 100%;
+    padding: 2rem 0;
+  }
+
+  .comment-form {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    border: 1px solid var(--comment-border-color);
+    border-radius: 8px;
+    background: var(--comment-bg);
+  }
+
+  .comment-form h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1.25rem;
+    color: var(--comment-text);
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  .form-group textarea,
+  .form-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--comment-border-color);
+    border-radius: 4px;
+    background: var(--comment-bg);
+    color: var(--comment-text);
+    font-family: inherit;
+    font-size: 0.9rem;
+  }
+
+  .form-group textarea:focus,
+  .form-group input:focus {
+    outline: none;
+    border-color: var(--comment-primary);
+  }
+
+  .guest-fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .submit-btn {
+    padding: 0.75rem 1.5rem;
+    background: var(--comment-primary);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: opacity 0.2s;
+  }
+
+  .submit-btn:hover {
+    opacity: 0.9;
+  }
+
+  .submit-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .comment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .comment-item {
+    padding: 1rem;
+    border: 1px solid var(--comment-border-color);
+    border-radius: 8px;
+    background: var(--comment-bg);
+  }
+
+  .comment-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .comment-author {
+    font-weight: 600;
+    color: var(--comment-text);
+  }
+
+  .comment-date {
+    color: var(--comment-muted);
+    font-size: 0.8rem;
+  }
+
+  .admin-badge {
+    padding: 0.125rem 0.5rem;
+    background: var(--comment-primary);
+    color: white;
+    border-radius: 4px;
+    font-size: 0.75rem;
+  }
+
+  .comment-content {
+    color: var(--comment-text);
+    line-height: 1.6;
+    margin-bottom: 0.75rem;
+  }
+
+  .comment-footer {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.85rem;
+  }
+
+  .like-btn,
+  .reply-btn {
+    background: none;
+    border: none;
+    color: var(--comment-muted);
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    transition: all 0.2s;
+  }
+
+  .like-btn:hover,
+  .reply-btn:hover {
+    background: var(--comment-border-color);
+    color: var(--comment-text);
+  }
+
+  .loading,
+  .no-comments,
+  .error {
+    text-align: center;
+    padding: 2rem;
+    color: var(--comment-muted);
+  }
+
+  .error {
+    color: #ef4444;
+  }
+
+  @media (max-width: 640px) {
+    .guest-fields {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

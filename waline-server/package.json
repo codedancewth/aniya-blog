@@ -1,0 +1,17 @@
+{
+  "name": "waline-server",
+  "version": "1.0.0",
+  "description": "Waline 评论服务端 - 本地 MySQL",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "@waline/vercel": "^1.39.3",
+    "dotenv": "^17.3.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

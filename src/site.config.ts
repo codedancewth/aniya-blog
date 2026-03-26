@@ -157,26 +157,20 @@ export const integ: IntegrationUserConfig = {
       className: 'zoomable'
     }
   },
-  // Comment system
+  // Comment system - 使用 Go 后端 API + MySQL 存储
   waline: {
-    enable: true,
-    // Server service link
-    server: 'https://astro-theme-pure-waline.arthals.ink/',
-    // Show meta info for comments
+    enable: false,  // 禁用 Waline，使用自定义评论组件
+    server: '',
     showMeta: false,
-    // Refer https://waline.js.org/en/guide/features/emoji.html
-    emoji: ['bmoji', 'weibo'],
-    // Refer https://waline.js.org/en/reference/client/props.html
-    additionalConfigs: {
-      // search: false,
-      pageview: true,
-      comment: true,
-      locale: {
-        reaction0: 'Like',
-        placeholder: 'Welcome to comment. (Email to receive replies. Login is unnecessary)'
-      },
-      imageUploader: false
-    }
+    emoji: [],
+    additionalConfigs: {}
+  },
+  comment: {
+    enable: true,
+    // Go 后端 API 地址
+    apiURL: 'http://localhost:8081/api/v1',
+    // 生产环境请改为你的服务器地址
+    // apiURL: 'https://api.wth2jhl.online/api/v1',
   }
 }
 
