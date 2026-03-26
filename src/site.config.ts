@@ -168,10 +168,10 @@ export const integ: IntegrationUserConfig = {
   // @ts-ignore - 自定义评论配置
   comment: {
     enable: true,
-    // Go 后端 API 地址
-    apiURL: 'http://localhost:8081/api/v1',
-    // 生产环境请改为你的服务器地址
-    // apiURL: 'https://api.wth2jhl.online/api/v1',
+    // Go 后端 API 地址（生产环境）
+    apiURL: 'http://42.194.241.104:8081/api/v1',
+    // 本地开发使用：
+    // apiURL: 'http://localhost:8081/api/v1',
   }
 }
 
