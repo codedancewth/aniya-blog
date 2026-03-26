@@ -153,29 +153,30 @@ func (h *CommentHandler) GetComment(c *gin.Context) {
 // @Success 200 {object} response.Response
 // @Router /api/v1/posts/:post_id/comments [get]
 func (h *CommentHandler) ListCommentsByPost(c *gin.Context) {
-	postParam := c.Param("post_id")
+	postParam := c.Param("slug")
 	
-	fmt.Printf("DEBUG: postParam=%s\n", postParam)
+	var postID uint
 	
-	// 直接使用 slug 查找文章
-	post, err := h.postRepo.FindBySlug(postParam)
-	fmt.Printf("DEBUG: FindBySlug result: post=%+v, err=%v\n", post, err)
-	
-	if err != nil {
-		// slug 找不到，返回空列表而不是错误
-		fmt.Printf("DEBUG: Returning empty list\n")
-		response.Success(c, gin.H{
-			"comments":   []interface{}{},
-			"total":      0,
-			"page":       1,
-			"pageSize":   10,
-			"totalPages": 0,
-		})
-		return
+	// 尝试解析为数字 ID
+	if id, err := strconv.ParseUint(postParam, 10, 32); err == nil {
+		// 是数字，直接用 ID
+		postID = uint(id)
+	} else {
+		// 不是数字，作为 slug 查找
+		post, err := h.postRepo.FindBySlug(postParam)
+		if err != nil {
+			// slug 找不到，返回空列表
+			response.Success(c, gin.H{
+				"comments":   []interface{}{},
+				"total":      0,
+				"page":       1,
+				"pageSize":   10,
+				"totalPages": 0,
+			})
+			return
+		}
+		postID = post.ID
 	}
-	
-	postID := post.ID
-	fmt.Printf("DEBUG: postID=%d\n", postID)
 
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "10"))

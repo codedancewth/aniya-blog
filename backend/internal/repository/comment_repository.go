@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"github.com/cworld1/aniya-blog/backend/internal/database"
 	"github.com/cworld1/aniya-blog/backend/internal/models"
 	"gorm.io/gorm"
@@ -47,23 +48,17 @@ func (r *CommentRepository) ListByPostID(postID uint, page, pageSize int) ([]*mo
 
 	offset := (page - 1) * pageSize
 
-	// 先查询总数
-	countQuery := r.db.Model(&models.Comment{}).
-		Where("post_id = ? AND status = ? AND parent_id IS NULL", postID, 1)
-	
-	if err := countQuery.Count(&total).Error; err != nil {
-		return nil, 0, err
-	}
-
-	// 查询评论（不 Preload User，避免 NULL 用户 ID 导致的问题）
-	query := r.db.Model(&models.Comment{}).
+	// 使用 GORM Debug 模式查看 SQL
+	result := r.db.Debug().Model(&models.Comment{}).
 		Where("post_id = ? AND status = ? AND parent_id IS NULL", postID, 1).
+		Count(&total).
 		Order("created_at DESC").
 		Offset(offset).
-		Limit(pageSize)
+		Limit(pageSize).
+		Find(&comments)
 
-	err := query.Find(&comments).Error
-	return comments, total, err
+	fmt.Printf("DEBUG: postID=%d, total=%d, comments=%+v, error=%v\n", postID, total, comments, result.Error)
+	return comments, total, result.Error
 }
 
 // List 获取评论列表
