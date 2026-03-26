@@ -21,7 +21,10 @@ comment: true
 
 ## 🎯 01 TapSpot 展示
 
-> 💡 提示：访问 http://wth2jhl.online/ 查看实时演示（打不开请留言，不定期维护）
+![TapSpot 首页展示](./img1-hero.png)
+*TapSpot 首页 - 世界地图铺展眼前，每个图标都是一个故事*
+
+> 💡 **在线体验**: http://wth2jhl.online/（打不开请留言，不定期维护）
 
 ## 🌟 02 TapSpot 介绍
 
@@ -44,30 +47,53 @@ comment: true
 - **GitHub 源码**: https://github.com/codedancewth/TapSpot/tree/momo
 - **测试账号**: `root` / `root`
 
-### ✨ 功能特性介绍
+## ✨ 功能特性介绍
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-6">
 
-- 🗺️ **交互式地图**  
-  使用高德/OpenStreetMap 地图，点击任意位置发帖
+### 🗺️ 交互式地图
 
-- 🔐 **用户系统**  
-  登录注册功能，测试账号 root/root
+使用高德/OpenStreetMap 地图，点击任意位置发帖
 
-- 📝 **帖子发布**  
-  支持日常、美食、住宿、购物等分类
+![地图浏览界面](./img2-map-view.png)
 
-- ⭐ **我的帖子**  
-  金色标记区分自己的帖子
+### 🔐 用户系统
 
-- ❤️ **点赞功能**  
-  为喜欢的帖子点赞
+登录注册功能，测试账号 root/root
 
-- 🔍 **搜索功能**  
-  搜索帖子和地点
+![登录界面](./img3-login.png)
 
-- 📱 **响应式设计**  
-  支持手机和电脑访问
+### 📝 帖子发布
+
+支持日常、美食、住宿、购物等分类
+
+![帖子类型选择](./img4-post-types.png)
+
+![创建帖子](./img5-create-post.png)
+
+### ⭐ 我的帖子
+
+金色标记区分自己的帖子
+
+![我的帖子列表](./img7-my-posts.png)
+
+### ❤️ 点赞功能
+
+为喜欢的帖子点赞
+
+![评论和点赞](./img6-comments.png)
+
+### 🔍 搜索功能
+
+搜索帖子和地点
+
+![搜索功能](./img8-search.png)
+
+### 📱 响应式设计
+
+支持手机和电脑访问
+
+![移动端适配](./img9-mobile.png)
 
 </div>
 
@@ -129,6 +155,8 @@ TapSpot 模式：帖子 ⟷ 评论（同一维度竞争）
 | **Git** | 版本控制与协作 |
 | **PM2** | 进程管理（生产环境推荐） |
 
+![技术栈总览](./img10-tech-stack.png)
+
 ### 步骤二：引导式与细节化
 
 **核心引导步骤**：
@@ -182,3 +210,5 @@ TapSpot 模式：帖子 ⟷ 评论（同一维度竞争）
 </a>
 
 </div>
+
+![GitHub 代码仓库](./img11-github.png)
