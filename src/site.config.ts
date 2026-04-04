@@ -165,14 +165,14 @@ export const integ: IntegrationUserConfig = {
     emoji: [],
     additionalConfigs: {}
   },
-  // @ts-ignore - 自定义评论配置
+  // 自定义评论配置（Go 后端 API + MySQL）
   comment: {
     enable: true,
     // Go 后端 API 地址（生产环境）
     apiURL: 'http://42.194.241.104:8081/api/v1',
     // 本地开发使用：
     // apiURL: 'http://localhost:8081/api/v1',
-  }
+  } as any
 }
 
 export const terms: CardListData = {

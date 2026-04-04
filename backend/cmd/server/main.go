@@ -75,7 +75,18 @@ func main() {
 
 	// 应用 CORS 中间件
 	r.Use(func(c *gin.Context) {
-		c.Header("Access-Control-Allow-Origin", cfg.Server.AllowOrigins[0])
+		origin := c.GetHeader("Origin")
+		// 检查请求来源是否在允许的列表中
+		for _, allowedOrigin := range cfg.Server.AllowOrigins {
+			if allowedOrigin == origin {
+				c.Header("Access-Control-Allow-Origin", origin)
+				break
+			}
+		}
+		// 如果没有匹配的来源，使用第一个允许的来源作为默认值
+		if c.GetHeader("Access-Control-Allow-Origin") == "" {
+			c.Header("Access-Control-Allow-Origin", cfg.Server.AllowOrigins[0])
+		}
 		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS")
 		c.Header("Access-Control-Allow-Headers", "Accept, Authorization, Content-Type, X-CSRF-Token")
 		c.Header("Access-Control-Expose-Headers", "Link")

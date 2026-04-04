@@ -215,9 +215,8 @@ const { class: className, postId } = Astro.props
     }
   }
 
-  if (config.integ.comment.enable) {
-    customElements.define('comment-section', CommentSection)
-  }
+  // 只要组件被渲染，就注册 custom element
+  customElements.define('comment-section', CommentSection)
 </script>
 
 <style>

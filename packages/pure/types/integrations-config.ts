@@ -58,7 +58,15 @@ export const IntegrationConfigSchema = () =>
       emoji: z.array(z.string()).optional(),
       /** Additional configurations for the Waline comment system. */
       additionalConfigs: z.record(z.string(), z.any()).default({})
-    })
+    }),
+
+    /** Custom comment system (Go backend API + MySQL) */
+    comment: z.object({
+      /** Enable the custom comment system. */
+      enable: z.boolean().default(false),
+      /** The API URL for the comment backend. */
+      apiURL: z.string().optional()
+    }).optional()
   })
 
 export type IntegrationConfig = z.infer<ReturnType<typeof IntegrationConfigSchema>>

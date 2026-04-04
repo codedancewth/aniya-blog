@@ -2,6 +2,7 @@ package config
 
 import (
 	"os"
+	"strings"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -62,9 +63,7 @@ func Load() *Config {
 		Server: ServerConfig{
 			Port: getEnv("SERVER_PORT", "8080"),
 			Mode: getEnv("SERVER_MODE", "debug"),
-			AllowOrigins: []string{
-				getEnv("ALLOW_ORIGIN", "http://localhost:4321"),
-			},
+			AllowOrigins: parseAllowOrigins(getEnv("ALLOW_ORIGIN", "http://localhost:4321,http://127.0.0.1:4321")),
 		},
 		Database: DatabaseConfig{
 			Driver:       getEnv("DB_DRIVER", "sqlite"),
@@ -100,4 +99,16 @@ func getEnv(key, defaultValue string) string {
 		return defaultValue
 	}
 	return value
+}
+
+// parseAllowOrigins 解析 CORS 允许的域名列表（逗号分隔）
+func parseAllowOrigins(allowOrigin string) []string {
+	if allowOrigin == "" {
+		return []string{"http://localhost:4321"}
+	}
+	origins := strings.Split(allowOrigin, ",")
+	for i, origin := range origins {
+		origins[i] = strings.TrimSpace(origin)
+	}
+	return origins
 }
